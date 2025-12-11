@@ -1,0 +1,34 @@
+{
+  "placeholderImages": [
+    {
+      "id": "dispensary-1",
+      "description": "A modern dispensary interior with plants.",
+      "imageUrl": "https://images.unsplash.com/photo-1713700743148-d0a71c09af94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxkaXNwZW5zYXJ5JTIwaW50ZXJpb3J8ZW58MHx8fHwxNzY0NjEzODAyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dispensary interior"
+    },
+    {
+      "id": "dispensary-2",
+      "description": "Close-up of a cannabis product.",
+      "imageUrl": "https://images.unsplash.com/photo-1601568656750-bf1a9c205613?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxjYW5uYWJpcyUyMHByb2R1Y3R8ZW58MHx8fHwxNzY0NjEzODAyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cannabis product"
+    },
+    {
+      "id": "dispensary-3",
+      "description": "A dispensary storefront on a sunny day.",
+      "imageUrl": "https://images.unsplash.com/photo-1755604526068-968974a12d27?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzdG9yZWZyb250JTIwZGF5fGVufDB8fHx8MTc2NDYxMzgwMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "storefront day"
+    },
+    {
+      "id": "user-avatar-1",
+      "description": "A placeholder avatar for a user.",
+      "imageUrl": "https://images.unsplash.com/photo-1531123414780-f74242c2b052?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cGVyc29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzY0NTc5NzM1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "user-avatar-2",
+      "description": "Another placeholder avatar for a user.",
+      "imageUrl": "https://images.unsplash.com/photo-1592621385612-4d7129426394?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2NDU3Mzc4MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman portrait"
+    }
+  ]
+}

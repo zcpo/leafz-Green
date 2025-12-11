@@ -1,0 +1,116 @@
+/**
+ * Core Philosophy: This ruleset establishes a security model where directory-style data
+ * (states, cities, dispensaries) is publicly readable but managed by a trusted admin role,
+ * while user-generated content (reviews) and profiles are strictly owned and managed by the
+ * users who create them.
+ *
+ * Data Structure:
+ * - /states/{stateId}: Publicly readable state information.
+ * - /states/{stateId}/cities/{cityId}: Publicly readable city information.
+ * - /states/{stateId}/cities/{cityId}/dispensaries/{dispensaryId}: Publicly readable dispensary info.
+ * - /states/{stateId}/cities/{cityId}/dispensaries/{dispensaryId}/reviews/{reviewId}: User reviews. Publicly
+ *   readable, but write/delete access is restricted to the review's author.
+ * - /users/{userId}: Private user profiles, only accessible by the owning user.
+ *
+ * Key Security Decisions:
+ * - Public Read, Admin Write: States, cities, and dispensaries are world-readable to allow anyone to browse the
+ *   app's content. All write operations (create, update, delete) on these collections are disabled for clients
+ *   to ensure data integrity. This data must be managed via a trusted backend or the Firebase Console.
+ * - User-Owned Reviews: Any authenticated user can create a review. The `userId` field in the review document
+ *   must match the creator's UID. Updates and deletes are only permitted if the requesting user's UID matches
+ *   the `userId` stored in the existing review document.
+ * - Private User Profiles: A user can only create, read, or update their own profile document, located at
+ *   /users/{their_auth_uid}. Listing the entire /users collection is disallowed to protect user privacy.
+ * - No Deletion of Profiles: Users cannot delete their own profiles to prevent orphaning their reviews and
+ *   other potential contributions.
+ *
+ * Denormalization for Authorization: The `userId` field is denormalized and stored in each `review` document.
+ * This is crucial for enforcing ownership-based security rules without needing expensive `get()` calls to
+ * other documents.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ----------------------------------------------------------------
+    // Helper Functions
+    // ----------------------------------------------------------------
+
+    /**
+     * Returns true if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Returns true if the authenticated user's UID matches the provided userId.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Returns true if the document exists and the user is the owner.
+     * Used for state-changing operations (update, delete).
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    // ----------------------------------------------------------------
+    // States, Cities, Dispensaries, and Reviews (Public Directory)
+    // ----------------------------------------------------------------
+
+    match /states/{stateId} {
+      // Publicly readable, admin-only writes.
+      allow read: if true;
+      allow write: if false;
+
+      match /cities/{cityId} {
+        // Publicly readable, admin-only writes.
+        allow read: if true;
+        allow write: if false;
+
+        match /dispensaries/{dispensaryId} {
+          // Publicly readable, admin-only writes.
+          allow read: if true;
+          allow write: if false;
+
+          match /reviews/{reviewId} {
+            // Reviews are public to read, but writes are restricted to owners.
+            allow get: if true;
+            allow list: if true;
+            
+            // Allow create if the user is signed in and is the author.
+            allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+            
+            // Allow update only by the original author. Author field cannot be changed.
+            allow update: if isExistingOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId;
+            
+            // Allow delete only by the original author.
+            allow delete: if isExistingOwner(resource.data.userId);
+          }
+        }
+      }
+    }
+
+    // ----------------------------------------------------------------
+    // User Profiles (Private Data)
+    // ----------------------------------------------------------------
+    
+    match /users/{userId} {
+      // A user can read and update their own profile.
+      allow get, update: if isOwner(userId);
+
+      // Deny listing all users for privacy.
+      allow list: if false;
+
+      // A user can create their own profile document.
+      allow create: if isOwner(userId);
+
+      // Disallow user profile deletion to prevent orphaning data.
+      allow delete: if false;
+    }
+  }
+}

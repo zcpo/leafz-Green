@@ -1,0 +1,283 @@
+
+{
+  "entities": {
+    "State": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "State",
+      "type": "object",
+      "description": "Represents a state where dispensaries are located.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the State entity (e.g., 'ca')."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the state (e.g., 'California')."
+        },
+        "abbreviation": {
+          "type": "string",
+          "description": "Two-letter state abbreviation (e.g., 'CA')."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "abbreviation"
+      ]
+    },
+    "City": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "City",
+      "type": "object",
+      "description": "Represents a city within a state where dispensaries are located.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the City entity (e.g., 'los-angeles')."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the city (e.g., 'Los Angeles')."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Dispensary": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Dispensary",
+      "type": "object",
+      "description": "Represents a dispensary located in a specific city.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Dispensary entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the dispensary."
+        },
+        "address": {
+          "type": "string",
+          "description": "Address of the dispensary."
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude coordinate of the dispensary."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude coordinate of the dispensary."
+        },
+        "website": {
+            "type": "string",
+            "format": "uri",
+            "description": "Official website of the dispensary."
+        },
+        "phone": {
+            "type": "string",
+            "description": "Contact phone number for the dispensary."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "address",
+        "latitude",
+        "longitude"
+      ]
+    },
+    "Review": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Review",
+      "type": "object",
+      "description": "Represents a user review for a dispensary.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Review entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User (Firebase Auth UID)."
+        },
+        "userName": {
+          "type": "string",
+          "description": "Display name of the user who wrote the review."
+        },
+        "rating": {
+          "type": "number",
+          "description": "Rating given by the user (1-5)."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Text comment provided by the user."
+        },
+        "photos": {
+          "type": "array",
+          "description": "Array of photo URLs associated with the review.",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date of the review submission.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "userName",
+        "rating",
+        "comment",
+        "createdAt"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity (Firebase Auth UID)."
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User's display name."
+        }
+      },
+      "required": [
+        "id",
+        "email"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "google.com"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/states/{stateId}",
+        "definition": {
+          "entityName": "State",
+          "schema": {
+            "$ref": "#/backend/entities/State"
+          },
+          "description": "Stores information about states. The document ID is the state's abbreviation (e.g., 'ca').",
+          "params": [
+            {
+              "name": "stateId",
+              "description": "The unique ID of the state (lowercase abbreviation)."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/states/{stateId}/cities/{cityId}",
+        "definition": {
+          "entityName": "City",
+          "schema": {
+            "$ref": "#/backend/entities/City"
+          },
+          "description": "Stores cities within a state. The document ID is a slugified version of the city name (e.g., 'los-angeles').",
+          "params": [
+            {
+              "name": "stateId",
+              "description": "The ID of the parent state."
+            },
+            {
+              "name": "cityId",
+              "description": "The unique ID of the city."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/states/{stateId}/cities/{cityId}/dispensaries/{dispensaryId}",
+        "definition": {
+          "entityName": "Dispensary",
+          "schema": {
+            "$ref": "#/backend/entities/Dispensary"
+          },
+          "description": "Stores dispensaries within a city.",
+          "params": [
+            {
+              "name": "stateId",
+              "description": "The ID of the parent state."
+            },
+            {
+              "name": "cityId",
+              "description": "The ID of the parent city."
+            },
+            {
+              "name": "dispensaryId",
+              "description": "The unique ID of the dispensary."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/states/{stateId}/cities/{cityId}/dispensaries/{dispensaryId}/reviews/{reviewId}",
+        "definition": {
+          "entityName": "Review",
+          "schema": {
+            "$ref": "#/backend/entities/Review"
+          },
+          "description": "Stores reviews for a specific dispensary.",
+          "params": [
+            {
+              "name": "stateId",
+              "description": "The ID of the parent state."
+            },
+            {
+              "name": "cityId",
+              "description": "The ID of the parent city."
+            },
+            {
+              "name": "dispensaryId",
+              "description": "The ID of the parent dispensary."
+            },
+            {
+              "name": "reviewId",
+              "description": "The unique ID of the review."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. The document ID is the Firebase Authentication UID.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching the Firebase Auth UID."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed hierarchically to support the WeedFinder app. It starts with a 'states' collection, nests 'cities' within states, 'dispensaries' within cities, and 'reviews' within dispensaries. This enables intuitive, path-based querying (e.g., getting all cities in a state). User data is kept in a separate top-level 'users' collection, keyed by UID, to decouple user profiles from the content they create and simplify security rules. This structure supports path-based ownership for user profiles and content, ensuring users can only modify their own data."
+  }
+}
