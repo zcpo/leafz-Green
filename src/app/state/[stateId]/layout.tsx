@@ -1,4 +1,3 @@
-rm -rf .git
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { getStateById } from "@/lib/data";
 import { notFound } from "next/navigation";
